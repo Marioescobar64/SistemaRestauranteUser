@@ -1,42 +1,22 @@
-import { body, param } from 'express-validator';
-import { checkValidators } from './check-validation.js';
+'use strict';
+import { body } from 'express-validator';
+import { validateFields } from './check-validation.js';
 
-// CREATE
-export const validateCreateEvento = [
-
-  body('nombreEvento')
-    .notEmpty().withMessage('Nombre obligatorio')
-    .isLength({ max: 150 }),
-
-  body('descripcion')
-    .notEmpty().withMessage('Descripción obligatoria'),
-
-  body('fecha')
-    .isISO8601().withMessage('Fecha inválida'),
-
-  body('horaInicio')
-    .notEmpty().withMessage('Hora inicio obligatoria'),
-
-  body('horaFin')
-    .notEmpty().withMessage('Hora fin obligatoria'),
-
-  checkValidators,
-];
-
-// UPDATE
-export const validateUpdateEventoRequest = [
-  param('id').isMongoId().withMessage('ID inválido'),
-  checkValidators,
-];
-
-// STATUS
-export const validateEventoStatusChange = [
-  param('id').isMongoId().withMessage('ID inválido'),
-  checkValidators,
-];
-
-// GET BY ID
-export const validateGetEventoById = [
-  param('id').isMongoId().withMessage('ID inválido'),
-  checkValidators,
+export const eventoValidator = [
+    body('nombreEvento')
+        .notEmpty().withMessage('El nombre es obligatorio')
+        .isLength({ max: 150 }).withMessage('Máximo 150 caracteres'),
+    body('descripcion')
+        .notEmpty().withMessage('La descripción es obligatoria'),
+    body('fecha')
+        .notEmpty().withMessage('La fecha es obligatoria')
+        .isISO8601().withMessage('Formato de fecha inválido (YYYY-MM-DD)'),
+    body('horaInicio')
+        .notEmpty().withMessage('La hora de inicio es obligatoria'),
+    body('horaFin')
+        .notEmpty().withMessage('La hora de fin es obligatoria'),
+    body('capacidadMax')
+        .notEmpty().withMessage('La capacidad es obligatoria')
+        .isInt({ min: 1 }).withMessage('La capacidad debe ser un número mayor a 0'),
+    validateFields // Este es tu middleware que revisa los errores de validación
 ];

@@ -1,54 +1,20 @@
+'use strict';
 import { Router } from 'express';
-import {
-  getEventos,
-  getEventoById,
-  createEvento,
-  updateEvento,
-  changeEventoStatus
-} from './event-controller.js';
-
-import {
-  validateCreateEvento,
-  validateUpdateEventoRequest,
-  validateEventoStatusChange,
-  validateGetEventoById
-} from '../../middlewares/event-validation.js';
+import { 
+    createEvento, 
+    getEventos, 
+    getEventoById, 
+    updateEvento, 
+    deleteEvento 
+} from './evento-controller.js';
+import { eventoValidator } from '../../middlewares/event-validation.js';
 
 const router = Router();
 
-// GET
+router.post('/', eventoValidator, createEvento);
 router.get('/', getEventos);
-
-router.get(
-  '/:id',
-  validateGetEventoById,
-  getEventoById
-);
-
-// POST
-router.post(
-  '/',
-  validateCreateEvento,
-  createEvento
-);
-
-// PUT
-router.put(
-  '/:id',
-  validateUpdateEventoRequest,
-  updateEvento
-);
-
-router.put(
-  '/:id/activate',
-  validateEventoStatusChange,
-  changeEventoStatus
-);
-
-router.put(
-  '/:id/deactivate',
-  validateEventoStatusChange,
-  changeEventoStatus
-);
+router.get('/:id', getEventoById);
+router.put('/:id', eventoValidator, updateEvento);
+router.delete('/:id', deleteEvento);
 
 export default router;
