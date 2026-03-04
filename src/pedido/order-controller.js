@@ -1,54 +1,109 @@
 'use strict';
 import Pedido from './order-model.js';
 
-export const getPedidos = async (req, res) => {
-  try {
-    const { page = 1, limit = 10, isActive = true } = req.query;
-
-    const filter = { isActive };
-
-    const pedidos = await Pedido.find(filter)
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .sort({ createdAt: -1 });
-
-    const total = await Pedido.countDocuments(filter);
-
-    res.json({
-      success: true,
-      data: pedidos,
-      pagination: {
-        currentPage: Number(page),
-        totalPages: Math.ceil(total / limit),
-        totalRecords: total
-      }
-    });
-
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-export const getPedidoById = async (req, res) => {
-  const pedido = await Pedido.findById(req.params.id);
-  if (!pedido) return res.status(404).json({ success: false });
-  res.json({ success: true, data: pedido });
-};
-
+// Crear pedido (201 Created)
 export const createPedido = async (req, res) => {
-  const pedido = new Pedido(req.body);
-  await pedido.save();
-  res.status(201).json({ success: true, data: pedido });
+    try {
+        const data = req.body;
+        const pedido = new Pedido(data);
+        await pedido.save();
+
+        return res.status(201).json({
+            success: true,
+            message: 'Pedido creado con éxito',
+            data: pedido
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Error al crear el pedido',
+            error: error.message
+        });
+    }
 };
 
+// Obtener pedidos con paginación (200 OK)
+export const getPedidos = async (req, res) => {
+    try {
+        const { limit = 10, skip = 0 } = req.query;
+        const query = { isActive: true };
+
+        const [total, pedidos] = await Promise.all([
+            Pedido.countDocuments(query),
+            Pedido.find(query)
+                .populate('mesa', 'numeroMesa') // Mostramos el número de mesa
+                .skip(Number(skip))
+                .limit(Number(limit))
+                .sort({ createdAt: -1 })
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            total,
+            data: pedidos
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Error al obtener los pedidos',
+            error: error.message
+        });
+    }
+};
+
+// Obtener un pedido por ID
+export const getPedidoById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const pedido = await Pedido.findById(id).populate('mesa');
+
+        if (!pedido || !pedido.isActive) {
+            return res.status(404).json({
+                success: false,
+                message: 'Pedido no encontrado'
+            });
+        }
+
+        return res.status(200).json({ success: true, data: pedido });
+    } catch (error) {
+        return res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+// Actualizar pedido
 export const updatePedido = async (req, res) => {
-  const pedido = await Pedido.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  if (!pedido) return res.status(404).json({ success: false });
-  res.json({ success: true, data: pedido });
+    try {
+        const { id } = req.params;
+        const data = req.body;
+
+        const pedidoActualizado = await Pedido.findByIdAndUpdate(id, data, { new: true });
+
+        if (!pedidoActualizado) {
+            return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Pedido actualizado correctamente',
+            data: pedidoActualizado
+        });
+    } catch (error) {
+        return res.status(500).json({ success: false, error: error.message });
+    }
 };
 
-export const changePedidoStatus = async (req, res) => {
-  const isActive = req.url.includes('/activate');
-  const pedido = await Pedido.findByIdAndUpdate(req.params.id, { isActive }, { new: true });
-  res.json({ success: true, data: pedido });
+// Borrado lógico (Desactivar pedido)
+export const deletePedido = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const pedido = await Pedido.findByIdAndUpdate(id, { isActive: false }, { new: true });
+
+        if (!pedido) {
+            return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+        }
+
+        return res.status(200).json({ success: true, message: 'Pedido eliminado' });
+    } catch (error) {
+        return res.status(500).json({ success: false, error: error.message });
+    }
 };

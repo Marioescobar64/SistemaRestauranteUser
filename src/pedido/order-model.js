@@ -9,6 +9,12 @@ const pedidoSchema = new mongoose.Schema({
         trim: true,
         maxLength: [100, 'El nombre del pedido no puede ser tan largo']
     },
+    // Relacionamos el pedido con una mesa específica
+    mesa: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Mesa',
+        required: [true, 'La mesa es obligatoria para registrar un pedido']
+    },
     descripcion: {
         type: String,
         required: [true, 'La descripción del pedido es obligatoria'],
@@ -16,7 +22,6 @@ const pedidoSchema = new mongoose.Schema({
     },
     fechaPedido: {
         type: Date,
-        // Si no le mandas fecha, tomará el momento exacto en el que se crea
         default: Date.now,
         required: [true, 'La fecha del pedido es obligatoria']
     },
@@ -28,17 +33,11 @@ const pedidoSchema = new mongoose.Schema({
     estado: {
         type: String,
         required: [true, 'El estado del pedido es obligatorio'],
-        // Usamos enum otra vez para obligar a que solo se usen estas 4 opciones
         enum: {
             values: ['Pendiente', 'En proceso', 'Entregado', 'Cancelado'],
             message: '{VALUE} no es un estado válido. Usa: Pendiente, En proceso, Entregado o Cancelado'
         },
-        // Lo más normal es que un pedido nuevo empiece como 'Pendiente'
         default: 'Pendiente'
-    },
-    editable: {
-        type: Boolean,
-        default: true // Asumo que al inicio se puede editar
     },
     isActive: {
         type: Boolean,
@@ -48,9 +47,8 @@ const pedidoSchema = new mongoose.Schema({
     timestamps: true 
 });
 
-// Índices para que buscar pedidos por estado o fecha sea rápido
 pedidoSchema.index({ estado: 1 });
 pedidoSchema.index({ fechaPedido: 1 });
+pedidoSchema.index({ mesa: 1 });
 
-// Exportamos el modelo con el nombre 'Pedido'
 export default mongoose.model('Pedido', pedidoSchema);
