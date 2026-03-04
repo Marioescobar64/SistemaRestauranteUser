@@ -17,7 +17,6 @@ const productoSchema = new mongoose.Schema({
     precio: {
         type: Number,
         required: [true, 'El precio es obligatorio'],
-        // Aseguramos que el precio no sea un número negativo
         min: [0, 'El precio no puede ser menor a 0'] 
     },
     categoria: {
@@ -25,20 +24,16 @@ const productoSchema = new mongoose.Schema({
         required: [true, 'La categoría es obligatoria'],
         trim: true
     },
-    // Siempre es buena idea agregar un campo para saber si el producto está disponible o no
     isActive: { 
         type: Boolean,
         default: true
     }
 }, {
-    // Agrega la fecha en que se creó y la última vez que se modificó
     timestamps: true 
 });
 
-// Ayuda a que las búsquedas por categoría, nombre o disponibilidad sean más rápidas
 productoSchema.index({ categoria: 1 });
 productoSchema.index({ nombre: 1 });
 productoSchema.index({ isActive: 1 });
 
-// Exportamos el modelo con el nombre 'Producto'
 export default mongoose.model('Producto', productoSchema);
