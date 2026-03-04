@@ -1,40 +1,9 @@
-import { body, param } from 'express-validator';
-import { checkValidators } from './check-validation.js';
+'use strict';
+import { param } from 'express-validator';
+import { validateFields } from './check-validation.js';
 
-// CREATE
-export const validateCreateMesa = [
-
-  body('descripcion')
-    .notEmpty().withMessage('Descripción obligatoria'),
-
-  body('numeroMesa')
-    .isInt({ min: 1 }).withMessage('Número inválido'),
-
-  body('capacidad')
-    .isInt({ min: 1 }).withMessage('Capacidad inválida'),
-
-  body('estado')
-    .optional()
-    .isIn(['Disponible', 'Ocupada', 'Reservada'])
-    .withMessage('Estado inválido'),
-
-  checkValidators,
-];
-
-// UPDATE
-export const validateUpdateMesaRequest = [
-  param('id').isMongoId().withMessage('ID inválido'),
-  checkValidators,
-];
-
-// STATUS
-export const validateMesaStatusChange = [
-  param('id').isMongoId().withMessage('ID inválido'),
-  checkValidators,
-];
-
-// GET BY ID
-export const validateGetMesaById = [
-  param('id').isMongoId().withMessage('ID inválido'),
-  checkValidators,
+export const validateTableId = [
+    param('id')
+        .isMongoId().withMessage('El ID de la mesa no tiene un formato válido'),
+    validateFields // Tu middleware que procesa los errores detectados
 ];
