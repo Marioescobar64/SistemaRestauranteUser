@@ -1,5 +1,5 @@
 'use strict';
-import Evento from './evento-model.js';
+import Evento from './event-model.js';
 
 // Crear un nuevo evento
 export const createEvento = async (req, res) => {

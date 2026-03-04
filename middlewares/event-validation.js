@@ -1,6 +1,6 @@
 'use strict';
 import { body } from 'express-validator';
-import { validateFields } from './check-validation.js';
+import { checkValidators } from './check-validation.js';
 
 export const eventoValidator = [
     body('nombreEvento')
@@ -18,5 +18,5 @@ export const eventoValidator = [
     body('capacidadMax')
         .notEmpty().withMessage('La capacidad es obligatoria')
         .isInt({ min: 1 }).withMessage('La capacidad debe ser un número mayor a 0'),
-    validateFields // Este es tu middleware que revisa los errores de validación
+    checkValidators // Este es tu middleware que revisa los errores de validación
 ];

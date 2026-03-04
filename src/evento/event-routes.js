@@ -6,7 +6,7 @@ import {
     getEventoById, 
     updateEvento, 
     deleteEvento 
-} from './evento-controller.js';
+} from './event-controller.js';
 import { eventoValidator } from '../../middlewares/event-validation.js';
 
 const router = Router();

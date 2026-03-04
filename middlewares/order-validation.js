@@ -1,6 +1,6 @@
 'use strict';
 import { body } from 'express-validator';
-import { validateFields } from './check-validation.js';
+import { checkValidators } from './check-validation.js';
 
 export const pedidoValidator = [
     body('nombrePedido')
@@ -15,5 +15,5 @@ export const pedidoValidator = [
         .optional()
         .isIn(['Pendiente', 'En proceso', 'Entregado', 'Cancelado'])
         .withMessage('Estado no válido'),
-    validateFields
+    checkValidators
 ];

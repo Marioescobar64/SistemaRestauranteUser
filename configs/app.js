@@ -8,8 +8,8 @@ import { corsOptions } from './cors-configuration.js';
 import { dbConnection } from './db.js';
 
 // Rutas
-import administrationRoutes from '../src/administration/router-administration.js';
-import maintenanceRoutes from '../src/maintenance/router-maintenance.js';
+//  import administrationRoutes from '../src/administration/router-administration.js';
+ import maintenanceRoutes from '../src/maintenance/router-maintenance.js';
 import menuRoutes from '../src/menu/router-menu.js';
 import productRoutes from '../src/producto/product-routes.js';
 import reservationRoutes from '../src/reservacion/reservation-routes.js';
@@ -33,8 +33,8 @@ const middlewares = (app) => {
 
 // Rutas de integracion de todas las rutas
 const routes =(app) => {
-    app.use(`${BASE_URL}/administration`, administrationRoutes);
-    app.use(`${BASE_URL}/maintenance`, maintenanceRoutes);
+ //  app.use(`${BASE_URL}/administration`, administrationRoutes);
+   app.use(`${BASE_URL}/maintenance`, maintenanceRoutes);
     app.use(`${BASE_URL}/menu`, menuRoutes);
     app.use(`${BASE_URL}/product`, productRoutes);
     app.use(`${BASE_URL}/reservation`, reservationRoutes);
@@ -48,7 +48,7 @@ const routes =(app) => {
 const initServer = async (app) => {
     // Creacion de la instancia de la aplicacion
     app = express();
-    const PORT = process.env.PORT || 3001;
+    const PORT = process.env.PORT || 3002;
 
     try {
         dbConnection();
