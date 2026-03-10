@@ -1,20 +1,54 @@
-'use strict';
 import { Router } from 'express';
-import { 
-    createPedido, 
-    getPedidos, 
-    getPedidoById, 
-    updatePedido, 
-    deletePedido 
+import {
+  getPedidos,
+  getPedidoById,
+  createPedido,
+  updatePedido,
+  changePedidoStatus
 } from './order-controller.js';
-import { pedidoValidator } from '../../middlewares/order-validation.js';
+
+import {
+  validateCreatePedido,
+  validateUpdatePedidoRequest,
+  validatePedidoStatusChange,
+  validateGetPedidoById
+} from '../../middlewares/order-validation.js';
 
 const router = Router();
 
-router.post('/', pedidoValidator, createPedido);
+// GET
 router.get('/', getPedidos);
-router.get('/:id', getPedidoById);
-router.put('/:id', pedidoValidator, updatePedido);
-router.delete('/:id', deletePedido);
+
+router.get(
+  '/:id',
+  validateGetPedidoById,
+  getPedidoById
+);
+
+// POST
+router.post(
+  '/',
+  validateCreatePedido,
+  createPedido
+);
+
+// PUT
+router.put(
+  '/:id',
+  validateUpdatePedidoRequest,
+  updatePedido
+);
+
+router.put(
+  '/:id/activate',
+  validatePedidoStatusChange,
+  changePedidoStatus
+);
+
+router.put(
+  '/:id/deactivate',
+  validatePedidoStatusChange,
+  changePedidoStatus
+);
 
 export default router;

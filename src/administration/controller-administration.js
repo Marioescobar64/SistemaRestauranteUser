@@ -1,23 +1,23 @@
-import Menu from '../menu/model-menu.js';
+import Administration from './model-administration.js';
 import { cloudinary } from '../../middlewares/file-uploader.js';
 
-// Obtener todos los platillos (paginación + filtros)
-export const getMenus = async (req, res) => {
+// Obtener todos los restaurantes (con paginación y filtros)
+export const getAdministrations = async (req, res) => {
   try {
     const { page = 1, limit = 10, isActive = true } = req.query;
 
     const filter = { isActive };
 
-    const menus = await Menu.find(filter)
+    const administrations = await Administration.find(filter)
       .limit(limit * 1)
       .skip((page - 1) * limit)
-      .sort({ saucerName: 1 });
+      .sort({ restaurantdName: 1 });
 
-    const total = await Menu.countDocuments(filter);
+    const total = await Administration.countDocuments(filter);
 
     res.status(200).json({
       success: true,
-      data: menus,
+      data: administrations,
       pagination: {
         currentPage: Number(page),
         totalPages: Math.ceil(total / limit),
@@ -28,86 +28,86 @@ export const getMenus = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error al obtener los platillos',
+      message: 'Error al obtener los restaurantes',
       error: error.message,
     });
   }
 };
 
-// Obtener platillo por ID
-export const getMenuById = async (req, res) => {
+// Obtener restaurante por ID
+export const getAdministrationById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const menu = await Menu.findById(id);
+    const administration = await Administration.findById(id);
 
-    if (!menu) {
+    if (!administration) {
       return res.status(404).json({
         success: false,
-        message: 'Platillo no encontrado',
+        message: 'Restaurante no encontrado',
       });
     }
 
     res.status(200).json({
       success: true,
-      data: menu,
+      data: administration,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error al obtener el platillo',
+      message: 'Error al obtener el restaurante',
       error: error.message,
     });
   }
 };
 
-// Crear platillo
-export const createMenu = async (req, res) => {
+// Crear restaurante
+export const createAdministration = async (req, res) => {
   try {
-    const menuData = req.body;
+    const administrationData = req.body;
 
     if (req.file) {
       const extension = req.file.path.split('.').pop();
       const filename = req.file.filename;
 
-      const relativePath = filename.includes('menu/')
-        ? filename.substring(filename.indexOf('menu/'))
+      const relativePath = filename.includes('administration/')
+        ? filename.substring(filename.indexOf('administration/'))
         : filename;
 
-      menuData.photo = `${relativePath}.${extension}`;
+      administrationData.photo = `${relativePath}.${extension}`;
     } else {
-      menuData.photo = 'administration/saucer';
+      administrationData.photo = 'administration/restaurant';
     }
 
-    const menu = new Menu(menuData);
-    await menu.save();
+    const administration = new Administration(administrationData);
+    await administration.save();
 
     res.status(201).json({
       success: true,
-      message: 'Platillo creado exitosamente',
-      data: menu,
+      message: 'Restaurante creado exitosamente',
+      data: administration,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Error al crear el platillo',
+      message: 'Error al crear el restaurante',
       error: error.message,
     });
   }
 };
 
-// Actualizar platillo
-export const updateMenu = async (req, res) => {
+// Actualizar restaurante
+export const updateAdministration = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = { ...req.body };
 
     if (req.file) {
-      const currentMenu = await Menu.findById(id);
+      const currentAdministration = await Administration.findById(id);
 
       // Eliminar imagen anterior de Cloudinary
-      if (currentMenu && currentMenu.photo) {
-        const photoPath = currentMenu.photo;
+      if (currentAdministration && currentAdministration.photo) {
+        const photoPath = currentAdministration.photo;
         const photoWithoutExt = photoPath.substring(
           0,
           photoPath.lastIndexOf('.')
@@ -125,69 +125,73 @@ export const updateMenu = async (req, res) => {
       const extension = req.file.path.split('.').pop();
       const filename = req.file.filename;
 
-      const relativePath = filename.includes('menu/')
-        ? filename.substring(filename.indexOf('menu/'))
+      const relativePath = filename.includes('administration/')
+        ? filename.substring(filename.indexOf('administration/'))
         : filename;
 
       updateData.photo = `${relativePath}.${extension}`;
     }
 
-    const menu = await Menu.findByIdAndUpdate(id, updateData, {
-      new: true,
-      runValidators: true,
-    });
+    const administration = await Administration.findByIdAndUpdate(
+      id,
+      updateData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
-    if (!menu) {
+    if (!administration) {
       return res.status(404).json({
         success: false,
-        message: 'Platillo no encontrado',
+        message: 'Restaurante no encontrado',
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Platillo actualizado exitosamente',
-      data: menu,
+      message: 'Restaurante actualizado exitosamente',
+      data: administration,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Error al actualizar el platillo',
+      message: 'Error al actualizar el restaurante',
       error: error.message,
     });
   }
 };
 
-// Activar / Desactivar platillo
-export const changeMenuStatus = async (req, res) => {
+// Activar / Desactivar restaurante
+export const changeAdministrationStatus = async (req, res) => {
   try {
     const { id } = req.params;
 
     const isActive = req.url.includes('/activate');
     const action = isActive ? 'activado' : 'desactivado';
 
-    const menu = await Menu.findByIdAndUpdate(
+    const administration = await Administration.findByIdAndUpdate(
       id,
       { isActive },
       { new: true }
     );
 
-    if (!menu) {
+    if (!administration) {
       return res.status(404).json({
         success: false,
-        message: 'Platillo no encontrado',
+        message: 'Restaurante no encontrado',
       });
     }
 
     res.status(200).json({
       success: true,
-      message: `Platillo ${action} exitosamente`,
-      data: menu,
+      message: `Restaurante ${action} exitosamente`,
+      data: administration,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error al cambiar el estado del platillo',
+      message: 'Error al cambiar el estado del restaurante',
       error: error.message,
     });
   }

@@ -1,12 +1,54 @@
-'use strict';
 import { Router } from 'express';
-import { getTables, getTableById } from './table-controller.js';
-import { validateTableId } from '../../middlewares/table-validation.js';
+import {
+  getMesas,
+  getMesaById,
+  createMesa,
+  updateMesa,
+  changeMesaStatus
+} from './table-controller.js';
+
+import {
+  validateCreateMesa,
+  validateUpdateMesaRequest,
+  validateMesaStatusChange,
+  validateGetMesaById
+} from '../../middlewares/table-validation.js';
 
 const router = Router();
 
-// Definimos solo rutas de lectura (Read)
-router.get('/', getTables);
-router.get('/:id', validateTableId, getTableById);
+// GET
+router.get('/', getMesas);
+
+router.get(
+  '/:id',
+  validateGetMesaById,
+  getMesaById
+);
+
+// POST
+router.post(
+  '/',
+  validateCreateMesa,
+  createMesa
+);
+
+// PUT
+router.put(
+  '/:id',
+  validateUpdateMesaRequest,
+  updateMesa
+);
+
+router.put(
+  '/:id/activate',
+  validateMesaStatusChange,
+  changeMesaStatus
+);
+
+router.put(
+  '/:id/deactivate',
+  validateMesaStatusChange,
+  changeMesaStatus
+);
 
 export default router;

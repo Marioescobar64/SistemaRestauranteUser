@@ -11,7 +11,7 @@ const mesaSchema = new mongoose.Schema({
     numeroMesa: {
         type: Number,
         required: [true, 'El número de mesa es obligatorio'],
-        unique: true, // Evita duplicados en la base de datos
+        unique: true, // Para que no haya dos mesas con el mismo número
         min: [1, 'El número de mesa debe ser al menos 1']
     },
     capacidad: {
@@ -26,25 +26,27 @@ const mesaSchema = new mongoose.Schema({
     estado: {
         type: String,
         required: [true, 'El estado de la mesa es obligatorio'],
+        // Solo permite estos tres estados específicos
         enum: {
             values: ['Disponible', 'Ocupada', 'Reservada'],
             message: '{VALUE} no es un estado válido. Usa: Disponible, Ocupada o Reservada'
         },
         default: 'Disponible'
     },
-    // Aunque sea de solo lectura para el cliente, dejamos isActive para control interno
+    editable: {
+        type: Boolean,
+        default: true
+    },
     isActive: {
         type: Boolean,
         default: true
     }
 }, {
-    // Agregamos timestamps para saber cuándo se creó o actualizó (puntos extra en rúbrica)
     timestamps: true
 });
 
-// Índices para que las búsquedas por número de mesa y estado sean ultra rápidas
-mesaSchema.index({ numeroMesa: 1 });
+// Índices para que sea rápido buscar mesas por número o por estado
 mesaSchema.index({ estado: 1 });
-mesaSchema.index({ isActive: 1 });
 
+// Exportamos el modelo con el nombre 'Mesa'
 export default mongoose.model('Mesa', mesaSchema);
